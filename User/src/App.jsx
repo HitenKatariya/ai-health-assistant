@@ -372,6 +372,7 @@ function App() {
   // Chat session management
   const [currentSession, setCurrentSession] = useState(null)
   const [sessionCreated, setSessionCreated] = useState(false)
+  const [isNavigatingToHospitals, setIsNavigatingToHospitals] = useState(false)
   
   // Local storage key for guest sessions
   const GUEST_SESSION_KEY = 'ai_health_guest_session'
@@ -775,6 +776,9 @@ function App() {
 
   // Enhanced navigation to hospitals with session tracking
   const navigateToHospitals = async () => {
+    if (isNavigatingToHospitals) return
+    setIsNavigatingToHospitals(true)
+
     if (user && token) {
       try {
         // Create session if one doesn't exist yet (user clicked emergency button before sending a message)
@@ -1296,8 +1300,19 @@ function App() {
                     <ReactMarkdown>{advice}</ReactMarkdown>
                   </div>
                   <div className="emergency-buttons">
-                    <button onClick={navigateToHospitals} className="emergency-hospitals-btn">
-                      {t.findHospitalsNow}
+                    <button
+                      onClick={navigateToHospitals}
+                      className="emergency-hospitals-btn"
+                      disabled={isNavigatingToHospitals}
+                    >
+                      {isNavigatingToHospitals ? (
+                        <>
+                          <span className="hospital-btn-spinner" aria-hidden="true"></span>
+                          {t.nhLoadingNearby}
+                        </>
+                      ) : (
+                        t.findHospitalsNow
+                      )}
                     </button>
                     {severity === 'EMERGENCY' && (
                       <a href="tel:112" className="call-911-btn">
@@ -1313,8 +1328,19 @@ function App() {
             if (message.content === 'hospital-finder-prompt') {
               return (
                 <div key={index} className="hospital-finder-prompt">
-                  <button onClick={navigateToHospitals} className="find-hospitals-btn">
-                    {t.findNearbyHospitals}
+                  <button
+                    onClick={navigateToHospitals}
+                    className="find-hospitals-btn"
+                    disabled={isNavigatingToHospitals}
+                  >
+                    {isNavigatingToHospitals ? (
+                      <>
+                        <span className="hospital-btn-spinner" aria-hidden="true"></span>
+                        {t.nhLoadingNearby}
+                      </>
+                    ) : (
+                      t.findNearbyHospitals
+                    )}
                   </button>
                 </div>
               )

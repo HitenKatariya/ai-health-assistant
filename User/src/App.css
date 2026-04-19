@@ -636,6 +636,10 @@ body {
 }
 
 .find-hospitals-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
   padding: 1.25rem 2.5rem;
   background: #28a745;
   color: white;
@@ -656,6 +660,11 @@ body {
 
 .find-hospitals-btn:active {
   background: #1e7e34;
+}
+
+.find-hospitals-btn:disabled {
+  opacity: 0.9;
+  cursor: not-allowed;
 }
 
 .location-error {
@@ -881,6 +890,10 @@ body {
 }
 
 .emergency-hospitals-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
   padding: 1rem 2rem;
   background: white;
   color: #dc2626;
@@ -903,6 +916,35 @@ body {
 
 .emergency-hospitals-btn:active {
   background: #e5e7eb;
+}
+
+.emergency-hospitals-btn:disabled {
+  opacity: 0.95;
+  cursor: not-allowed;
+}
+
+.hospital-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: hospitalBtnSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.emergency-hospitals-btn .hospital-btn-spinner {
+  border: 2px solid rgba(220, 38, 38, 0.3);
+  border-top-color: #dc2626;
+}
+
+@keyframes hospitalBtnSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .call-911-btn {
