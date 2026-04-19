@@ -345,7 +345,8 @@ export const findHospitalsFromDatabase = async (location, radiusKm = 5) => {
       distance: hospital.distance,
       rating: 'N/A',
       userRatingsTotal: 0,
-      isOpen: hospital.isOpen,
+      // Only keep explicit boolean values; unknown status should remain null
+      isOpen: typeof hospital.isOpen === 'boolean' ? hospital.isOpen : null,
       phone: hospital.phone,
       email: hospital.email,
       website: null,

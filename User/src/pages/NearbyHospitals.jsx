@@ -418,7 +418,7 @@ function NearbyHospitals() {
               >
                 <div className="hospital-card-header">
                   <span className="hospital-rank">#{index + 1}</span>
-                  {hospital.isOpen !== null && (
+                  {typeof hospital.isOpen === 'boolean' && (
                     <span className={`status-badge ${hospital.isOpen ? 'open' : 'closed'}`}>
                       {hospital.isOpen ? t.nhOpen : t.nhClosed}
                     </span>
