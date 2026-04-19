@@ -248,6 +248,11 @@ Current deployment model:
 - User frontend on Vercel
 - Hospital frontend on Vercel
 
+Live deployment links:
+- User app: https://ai-health-assistant-chi.vercel.app
+- Hospital app: https://ai-health-assistant-hospital.vercel.app/
+- Backend API: https://ai-health-assistant-backend-ejmt.onrender.com
+
 Important production settings:
 - Set frontend `VITE_API_BASE_URL` to your Render backend URL.
 - Set backend `CORS_ORIGIN` to both Vercel domains (comma-separated).
