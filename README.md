@@ -1,103 +1,276 @@
-# Online Health AI Assistant with Emergency Support
+# AI Healthcare Assistant
 
-A modern Medical AI Assistant with stunning 3D UI and emergency hospital finder feature.
+Full-stack healthcare platform with:
 
-## Features
+- User AI consultation web app
+- Nearby hospital discovery and directions
+- Appointment booking flow
+- Hospital-facing dashboard web app
+- Node.js + Express + MongoDB backend API
 
-- 🧬 **3D DNA Helix Background** - Interactive 3D visualization with adjustable opacity
-- 💎 **Glassmorphism UI** - High-end frosted glass design with smooth animations
-- 🤖 **AI-Powered Diagnosis** - Systematic symptom-based health assessment using Groq AI
-- 🏥 **Hospital Finder** - Automatic nearby hospital detection with directions
-- 🗺️ **Location Services** - Geolocation-based emergency support
-- 📱 **Responsive Design** - Works seamlessly on all devices
+This repository is a multi-app workspace, not a single frontend.
+
+## Project Architecture
+
+### Applications
+
+1. User app (`User`)
+- AI symptom conversation (Groq)
+- Emergency symptom detection
+- Nearby hospitals page
+- User authentication and consultation history
+- Appointment booking
+
+2. Hospital app (`Hospital`)
+- Hospital registration/login
+- Manage hospital profile and hospital-side workflows
+- Appointment operations via backend APIs
+
+3. Backend API (`Hospital/backend`)
+- Auth APIs for users and hospitals
+- Hospital registry and nearby search
+- Chat session/history APIs
+- Appointment APIs for both user and hospital sides
+
+### High-Level Flow
+
+1. User talks to AI in the User app.
+2. User can open Nearby Hospitals and search by live location.
+3. User books appointment with a selected hospital.
+4. Hospital app consumes the same backend to view and update appointments.
+
+## Repository Structure
+
+```text
+ai-health-assistant/
+	User/                # User-facing React app
+	Hospital/            # Hospital-facing React app
+		backend/           # Express + MongoDB backend API
+	DEPLOYMENT.md        # Render + Vercel deployment steps
+	render.yaml          # Render blueprint config
+```
 
 ## Tech Stack
 
-- **Frontend**: React + Vite
-- **3D Graphics**: Three.js, React Three Fiber
-- **AI**: Groq API (LLaMA 3.3 70B)
-- **Styling**: Custom CSS with glassmorphism effects
-- **Maps**: OpenStreetMap + Google Maps integration
+### Frontend
+- React 19 + Vite
+- React Router
+- React Markdown
+- Three.js + @react-three/fiber + @react-three/drei (User app visual layer)
 
-## Setup Instructions
+### Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT authentication
+- bcryptjs password hashing
 
-### 1. Clone the repository
+### Integrations
+- Groq API (AI responses)
+- Browser Geolocation
+- Google Maps directions (client-side link out)
+
+## Key Features
+
+### User App
+- AI-guided symptom assessment conversation
+- Emergency cue detection and urgent prompts
+- Nearby hospital discovery with distance sorting
+- Appointment booking with optional chat context
+- Multi-language support (English, Hindi, Gujarati)
+
+### Hospital App
+- Hospital onboarding and login
+- Hospital data management
+- Appointment status handling (pending, confirmed, completed)
+
+### Backend
+- User auth: register, login, profile
+- Hospital auth: register, login
+- Chat session lifecycle and history persistence
+- Nearby hospital APIs
+- Appointment APIs for both user and hospital roles
+
+## Recent UX Fixes
+
+- Added loading spinner state when user clicks "Find Nearby Hospitals" so long navigation/data preparation is visible.
+- Corrected open/closed badge logic so unknown operating status is not incorrectly shown as "Closed".
+
+## Prerequisites
+
+- Node.js 18+
+- npm 9+
+- MongoDB Atlas (or compatible MongoDB)
+- Groq API key
+
+## Local Development Setup
+
+### 1. Clone
+
 ```bash
-git clone https://github.com/Neel6504/Online-Health-AI-Assistant-with-Emergency-Support.git
-cd Online-Health-AI-Assistant-with-Emergency-Support
+git clone https://github.com/HitenKatariya/ai-health-assistant.git
+cd ai-health-assistant
 ```
 
-### 2. Install dependencies
+### 2. Install Dependencies
+
 ```bash
 cd User
 npm install
+
+cd ../Hospital
+npm install
+
+cd backend
+npm install
 ```
 
-### 3. Configure environment variables
-Create a `.env` file in the `User` directory:
+### 3. Configure Environment Variables
+
+Create these files:
+
+1. `Hospital/backend/.env`
+
 ```env
-VITE_GROQ_API_KEY=your_groq_api_key_here
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>/<db>?retryWrites=true&w=majority
+PORT=3001
+NODE_ENV=development
+JWT_SECRET=replace_with_a_strong_secret
+JWT_EXPIRE=30d
+CORS_ORIGIN=http://localhost:5173,http://localhost:5174
 ```
 
-Get your free Groq API key from: https://console.groq.com/
+2. `User/.env`
 
-### 4. Run the development server
+```env
+VITE_API_BASE_URL=http://localhost:3001
+VITE_GROQ_API_KEY=your_groq_api_key
+```
+
+3. `Hospital/.env`
+
+```env
+VITE_API_BASE_URL=http://localhost:3001
+```
+
+Notes:
+- Frontends also accept `VITE_API_URL` as fallback.
+- Default frontend API fallback is `http://localhost:3001`.
+
+### 4. Run Services (3 terminals)
+
+1. Backend
+
 ```bash
+cd Hospital/backend
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser.
+2. User app
 
-## How to Use
+```bash
+cd User
+npm run dev -- --port 5173
+```
 
-1. **Start a Conversation**: Describe your symptoms to the AI assistant
-2. **Answer Questions**: The AI will ask follow-up questions to understand your condition
-3. **Get Assessment**: After gathering information, the AI provides possible diagnoses
-4. **Find Hospitals**: Click the "Find Nearby Hospitals" button to locate medical facilities
-5. **Get Directions**: Click on any hospital to open directions in Google Maps
+3. Hospital app
 
-## Important Note
+```bash
+cd Hospital
+npm run dev -- --port 5174
+```
 
-⚠️ **This tool is for informational purposes only and is NOT a substitute for professional medical advice. Always consult a healthcare professional for proper diagnosis and treatment.**
+Open:
 
-## Features in Detail
+- User app: `http://localhost:5173`
+- Hospital app: `http://localhost:5174`
+- Backend: `http://localhost:3001`
 
-### AI Diagnosis System
-- Systematic question-based approach
-- Analyzes symptoms using medical knowledge
-- Provides ranked list of possible conditions
-- Maintains conversation context
+## Scripts
 
-### Hospital Finder
-- Automatic location detection
-- Searches within 5km radius
-- Multiple API endpoints for reliability
-- Direct Google Maps integration
-- Displays hospital name, address, and phone number
+### User (`User/package.json`)
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
 
-### 3D Interface
-- Animated DNA helix with customizable opacity
-- Particle effects and starfield background
-- Smooth rotations and transitions
-- Optimized for performance
+### Hospital (`Hospital/package.json`)
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
 
-## Browser Compatibility
+### Backend (`Hospital/backend/package.json`)
+- `npm run dev` (nodemon)
+- `npm start`
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+## API Overview
 
-Location services must be enabled for the hospital finder feature.
+Base URL: `http://localhost:3001`
+
+### Auth
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `PUT /api/auth/profile`
+- `PUT /api/auth/password`
+- `DELETE /api/auth/account`
+
+### Hospitals
+- `POST /api/hospitals/register`
+- `POST /api/hospitals/login`
+- `GET /api/hospitals`
+- `GET /api/hospitals/:id`
+- `POST /api/hospitals/nearby`
+
+### Chat
+- `POST /api/chat/sessions`
+- `GET /api/chat/sessions`
+- `GET /api/chat/sessions/:sessionId`
+- `POST /api/chat/sessions/:sessionId/messages`
+- `POST /api/chat/sessions/:sessionId/hospitals`
+- `PUT /api/chat/sessions/:sessionId/end`
+
+### Appointments
+- User routes:
+	- `POST /api/appointments`
+	- `GET /api/appointments`
+	- `GET /api/appointments/:id`
+- Hospital routes:
+	- `GET /api/appointments/hospital`
+	- `PATCH /api/appointments/hospital/:id/status`
+
+## Deployment
+
+Production deployment instructions are documented in `DEPLOYMENT.md`.
+
+Current deployment model:
+- Backend on Render
+- User frontend on Vercel
+- Hospital frontend on Vercel
+
+Important production settings:
+- Set frontend `VITE_API_BASE_URL` to your Render backend URL.
+- Set backend `CORS_ORIGIN` to both Vercel domains (comma-separated).
+
+## Medical Disclaimer
+
+This project is for informational and educational support only. It does not replace professional medical advice, diagnosis, or treatment.
+
+## Troubleshooting
+
+### Nearby hospitals are slow to appear
+- Check browser geolocation permission.
+- Verify backend connectivity and MongoDB status.
+- Confirm frontend `VITE_API_BASE_URL` points to a live backend.
+
+### Hospital shows incorrect closed status
+- Ensure hospital `isOpen` data is stored as explicit boolean.
+- Unknown status should render without a closed badge.
+
+### CORS errors
+- Verify backend `CORS_ORIGIN` includes both frontend origins.
+- Restart backend after env changes.
 
 ## License
 
-MIT License
-
-## Developer
-
-Neel - [GitHub](https://github.com/Neel6504)
-
-## Support
-
-For issues or questions, please open an issue on GitHub.
+ISC
