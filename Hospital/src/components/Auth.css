@@ -13,16 +13,16 @@ body {
 }
 
 .auth-container {
-  min-height: 100vh;
-  height: auto;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 1.5rem;
+  justify-content: center;
+  padding: 0.75rem;
   background: #f5f7fa;
   position: relative;
-  overflow-y: auto;
 }
 
 .auth-container::before {
@@ -53,7 +53,7 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .signup-card-wrapper {
@@ -62,11 +62,11 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 1200px;
-  height: auto;
-  max-height: none;
+  height: calc(100vh - 1.5rem);
+  max-height: calc(100vh - 1.5rem);
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
   z-index: 1;
   border: 1px solid #e1e4e8;
@@ -90,7 +90,7 @@ body {
   text-align: left;
   margin-bottom: 0;
   flex-shrink: 0;
-  padding: 1.5rem;
+  padding: 0.75rem 1.25rem;
   background: #fafbfc;
   border-bottom: 1px solid #e1e4e8;
 }
@@ -98,16 +98,16 @@ body {
 /* Progress Bar Styles */
 .progress-container {
   width: 100%;
-  margin-top: 1.5rem;
+  margin-top: 0.6rem;
 }
 
 .progress-bar {
   width: 100%;
-  height: 8px;
+  height: 6px;
   background: #e1e4e8;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
 .progress-fill {
@@ -118,22 +118,43 @@ body {
 }
 
 .progress-text {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: #586069;
   font-weight: 500;
   text-align: center;
 }
 
 .auth-header h1 {
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   color: #24292e;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.1rem;
   font-weight: 600;
 }
 
 .auth-header p {
   color: #586069;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+}
+
+.header-login-prompt {
+  margin-top: 0.25rem;
+  font-size: 0.8rem !important;
+  color: #586069;
+}
+
+.header-login-btn {
+  background: none;
+  border: none;
+  color: #0366d6;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: none;
+}
+
+.header-login-btn:hover {
+  text-decoration: underline;
 }
 
 .auth-form {
@@ -157,11 +178,10 @@ body {
 }
 
 .signup-form {
-  max-height: 60vh;
+  /* height managed by dashboard-content; do not constrain here */
   overflow-y: auto;
-  padding-right: 1rem;
   scrollbar-width: thin;
-  scrollbar-color: #667eea #f0f0f0;
+  scrollbar-color: #0366d6 #f0f0f0;
 }
 
 .signup-form::-webkit-scrollbar {
@@ -179,8 +199,8 @@ body {
 }
 
 .form-section {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -192,8 +212,8 @@ body {
 
 .form-section h3 {
   color: #0366d6;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   font-weight: 600;
@@ -211,19 +231,19 @@ body {
 }
 
 .form-group label {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #24292e;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 0.75rem 1rem;
+  padding: 0.45rem 0.75rem;
   border: 1px solid #d1d5da;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   transition: all 0.2s ease;
   outline: none;
   font-family: inherit;
@@ -362,13 +382,11 @@ body {
 .auth-footer {
   text-align: center;
   margin-top: 0;
-  padding: 1.5rem;
+  padding: 0.6rem 1.25rem;
   border-top: 1px solid #e1e4e8;
   flex-shrink: 0;
   background: #fafbfc;
   z-index: 10;
-  position: sticky;
-  bottom: 0;
   width: 100%;
 }
 
@@ -668,22 +686,19 @@ body {
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: 0.5rem;
+  gap: 0;
 }
 
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 0;
-  margin-bottom: 0;
-  flex: 1 1 auto;
-  overflow-y: auto;
-  overflow-x: hidden;
+  gap: 0.75rem;
+  margin: 0;
+  flex: 1 1 0;
+  overflow: hidden;
   min-height: 0;
-  max-height: 80%;
   background: transparent;
-  padding: 1.5rem;
+  padding: 0.75rem;
 }
 
 @media (max-width: 992px) {
@@ -711,7 +726,7 @@ body {
 .sidebar {
   background: #fafbfc;
   border-radius: 8px;
-  padding: 0.75rem;
+  padding: 0.5rem;
   overflow-x: auto;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -721,7 +736,7 @@ body {
 .sidebar-nav {
   display: flex;
   flex-direction: row;
-  gap: 0.75rem;
+  gap: 0.5rem;
   justify-content: space-between;
 }
 
@@ -729,15 +744,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.75rem 1rem;
+  gap: 0.2rem;
+  padding: 0.45rem 0.6rem;
   border: 1px solid #e1e4e8;
   background: white;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #586069;
   font-weight: 500;
   position: relative;
@@ -777,7 +792,7 @@ body {
 }
 
 .sidebar-icon {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
 }
 
@@ -814,13 +829,15 @@ body {
 .dashboard-content {
   background: #ffffff;
   border-radius: 8px;
-  padding: 1.5rem 2rem;
+  padding: 1rem 1.5rem;
   border: 1px solid #e1e4e8;
   overflow-y: auto;
   width: 100%;
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #0366d6 #e1e4e8;
 }
 
 .form-section-content {
@@ -839,23 +856,23 @@ body {
 }
 
 .form-section-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   color: #24292e;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
   border-bottom: 2px solid #e1e4e8;
 }
 
 .form-section-content .section-description {
   color: #586069;
-  margin-bottom: 2rem;
-  margin-top: 1rem;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .register-btn {
@@ -879,16 +896,16 @@ body {
 .section-navigation {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  margin-top: 2.5rem;
-  padding-top: 2rem;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
   border-top: 1px solid #e1e4e8;
 }
 
 .nav-btn {
-  padding: 0.875rem 1.75rem;
+  padding: 0.55rem 1.25rem;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -990,4 +1007,33 @@ body {
   .form-section-content h2 {
     font-size: 1.4rem;
   }
+}
+
+/* Footer Styles */
+.auth-footer {
+  padding: 1.25rem;
+  text-align: center;
+  border-top: 1px solid #e1e4e8;
+  background: #fafbfc;
+  flex-shrink: 0;
+}
+
+.auth-footer p {
+  margin: 0;
+  color: #586069;
+  font-size: 0.9rem;
+}
+
+.toggle-auth-btn {
+  background: none;
+  border: none;
+  color: #0366d6;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0 0.25rem;
+}
+
+.toggle-auth-btn:hover {
+  text-decoration: underline;
 }

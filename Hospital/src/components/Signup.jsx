@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Auth.css'
 import MEDICAL_SERVICES from '../constants/medicalServices'
-import { getCurrentLocation } from '../services/locationService'
+import { getCurrentLocation, reverseGeocode } from '../services/locationService'
 import { HOSPITALS_API } from '../config/api'
 
 const WEEK_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -40,6 +40,65 @@ function Signup({ onToggleAuth, onSignupSuccess }) {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [isDetectingLocation, setIsDetectingLocation] = useState(false)
+
+  const validateSection = (sectionId) => {
+    switch (sectionId) {
+      case 'hospital-info':
+        return (
+          formData.hospitalName.trim() !== '' &&
+          formData.registrationNumber.trim() !== '' &&
+          formData.establishedYear !== '' &&
+          formData.establishedYear <= new Date().getFullYear()
+        )
+      case 'contact':
+        return (
+          /\S+@\S+\.\S+/.test(formData.email) &&
+          /^\d{10}$/.test(formData.phone.replace(/\D/g, '')) &&
+          formData.address.trim() !== '' &&
+          formData.city.trim() !== '' &&
+          formData.state.trim() !== '' &&
+          /^\d{6}$/.test(formData.pincode) &&
+          formData.latitude !== '' &&
+          formData.longitude !== ''
+        )
+      case 'hospital-details':
+        return (
+          formData.hospitalType !== '' &&
+          formData.totalBeds !== '' &&
+          formData.specializations.trim() !== '' &&
+          formData.openDays.length > 0 &&
+          formData.operatingHours.openingTime !== '' &&
+          formData.operatingHours.closingTime !== '' &&
+          formData.operatingHours.openingTime < formData.operatingHours.closingTime
+        )
+      case 'medical-services':
+        return formData.availableServices.length > 0
+      case 'admin':
+        return (
+          formData.adminName.trim() !== '' &&
+          formData.adminPosition.trim() !== ''
+        )
+      case 'security':
+        return (
+          formData.password.length >= 8 &&
+          formData.password === formData.confirmPassword
+        )
+      default:
+        return false
+    }
+  }
+
+  useEffect(() => {
+    const newlyCompleted = sections
+      .filter(section => validateSection(section.id))
+      .map(section => section.id)
+    
+    // Only update if it actually changed to avoid infinite loops or unnecessary renders
+    setCompletedSections(prev => {
+      if (JSON.stringify(prev) === JSON.stringify(newlyCompleted)) return prev
+      return newlyCompleted
+    })
+  }, [formData])
 
   const sections = [
     { id: 'hospital-info', label: 'Hospital Information', icon: '🏥', shortLabel: 'Info' },
@@ -139,17 +198,43 @@ function Signup({ onToggleAuth, onSignupSuccess }) {
     setIsDetectingLocation(true)
     try {
       const location = await getCurrentLocation()
+      
+      // Update coordinates
       setFormData(prev => ({
         ...prev,
         latitude: location.latitude.toFixed(6),
         longitude: location.longitude.toFixed(6)
       }))
-      // Clear location errors
+
+      // Clear coordinate errors
       setErrors(prev => ({
         ...prev,
         latitude: '',
         longitude: ''
       }))
+
+      // Attempt to reverse geocode to get city, state, and pincode
+      try {
+        const addressData = await reverseGeocode(location.latitude, location.longitude)
+        
+        setFormData(prev => ({
+          ...prev,
+          city: addressData.city || prev.city,
+          state: addressData.state || prev.state,
+          pincode: addressData.pincode || prev.pincode
+        }))
+
+        // Clear address errors if data was found
+        setErrors(prev => ({
+          ...prev,
+          city: addressData.city ? '' : (prev.city ? '' : prev.city),
+          state: addressData.state ? '' : (prev.state ? '' : prev.state),
+          pincode: addressData.pincode ? '' : (prev.pincode ? '' : prev.pincode)
+        }))
+      } catch (geoError) {
+        console.warn('Reverse geocoding failed, but coordinates were updated:', geoError)
+      }
+
       alert(`Location detected successfully!\nLatitude: ${location.latitude.toFixed(6)}\nLongitude: ${location.longitude.toFixed(6)}`)
     } catch (error) {
       console.error('Location detection error:', error)
@@ -793,14 +878,7 @@ function Signup({ onToggleAuth, onSignupSuccess }) {
   const handleNextSection = () => {
     if (isLastSection) return
 
-    const currentSectionId = sections[currentSectionIndex]?.id
     const nextSectionId = sections[currentSectionIndex + 1]?.id
-
-    if (currentSectionId) {
-      setCompletedSections(prev =>
-        prev.includes(currentSectionId) ? prev : [...prev, currentSectionId]
-      )
-    }
 
     if (nextSectionId) {
       setCurrentSection(nextSectionId)
@@ -821,6 +899,12 @@ function Signup({ onToggleAuth, onSignupSuccess }) {
         <div className="auth-header">
           <h1>🏥 Hospital Registration</h1>
           <p>Complete all sections to register your hospital</p>
+          <p className="header-login-prompt">
+            Already have an account?{' '}
+            <button onClick={onToggleAuth} className="header-login-btn">
+              Login here
+            </button>
+          </p>
           <div className="progress-container">
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>

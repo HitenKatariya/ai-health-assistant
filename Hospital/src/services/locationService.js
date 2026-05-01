@@ -53,6 +53,42 @@ export const getCurrentLocation = () => {
 }
 
 /**
+ * Reverse geocode coordinates to address using Nominatim API (OpenStreetMap)
+ */
+export const reverseGeocode = async (latitude, longitude) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+      {
+        headers: {
+          'Accept-Language': 'en-US,en;q=0.9',
+          'User-Agent': 'AI-Health-Assistant-Hospital-Portal'
+        }
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch address from coordinates')
+    }
+
+    const data = await response.json()
+    
+    if (!data.address) {
+      throw new Error('No address found for these coordinates')
+    }
+
+    return {
+      city: data.address.city || data.address.town || data.address.village || data.address.suburb || '',
+      state: data.address.state || '',
+      pincode: data.address.postcode || ''
+    }
+  } catch (error) {
+    console.error('Reverse geocoding error:', error)
+    throw error
+  }
+}
+
+/**
  * Format coordinates for display
  */
 export const formatCoordinates = (lat, lng) => {

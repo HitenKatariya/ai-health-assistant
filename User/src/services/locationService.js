@@ -29,7 +29,11 @@ const toRad = (value) => {
 }
 
 /**
- * Get user's current location using browser geolocation API
+ * Get user's current location using browser geolocation API.
+ * Strategy:
+ *  1. Try high-accuracy with a 30s timeout and allow a recently cached position (5 min).
+ *  2. If that times out, automatically retry with low accuracy (fast network-based fix).
+ * This eliminates the "timed out" error users see on cold first load.
  */
 export const getUserLocation = () => {
   return new Promise((resolve, reject) => {
@@ -38,40 +42,57 @@ export const getUserLocation = () => {
       return
     }
 
+    const handleSuccess = (position) => {
+      const coords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy: position.coords.accuracy
+      }
+      console.log('[NearbyHospitals] Geolocation success:', coords)
+      resolve(coords)
+    }
+
+    const buildErrorMessage = (error) => {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          return 'Location access is required to find nearby hospitals.'
+        case error.POSITION_UNAVAILABLE:
+          return 'Location information is unavailable.'
+        case error.TIMEOUT:
+          return 'Location request timed out. Please try again.'
+        default:
+          return 'An unknown error occurred while getting location.'
+      }
+    }
+
+    // First attempt: high accuracy, allow cached position up to 5 minutes old
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const coords = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          accuracy: position.coords.accuracy
-        }
-        console.log('[NearbyHospitals] Geolocation success:', coords)
-        resolve(coords)
-      },
+      handleSuccess,
       (error) => {
-        let errorMessage = 'Unable to retrieve your location.'
-        
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location access is required to find nearby hospitals.'
-            break
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information is unavailable.'
-            break
-          case error.TIMEOUT:
-            errorMessage = 'Location request timed out. Please try again.'
-            break
-          default:
-            errorMessage = 'An unknown error occurred while getting location.'
+        if (error.code === error.TIMEOUT) {
+          // Retry automatically with low accuracy (returns fast via network/WiFi)
+          console.warn('[NearbyHospitals] High-accuracy timed out, retrying with low accuracy...')
+          navigator.geolocation.getCurrentPosition(
+            handleSuccess,
+            (retryError) => {
+              console.error('[NearbyHospitals] Geolocation retry error:', retryError)
+              reject(new Error(buildErrorMessage(retryError)))
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 15000,
+              maximumAge: 300000 // 5 minutes
+            }
+          )
+        } else {
+          console.error('[NearbyHospitals] Geolocation error:', error)
+          reject(new Error(buildErrorMessage(error)))
         }
-        
-        console.error('[NearbyHospitals] Geolocation error:', error)
-        reject(new Error(errorMessage))
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        timeout: 30000,   // 30s — enough for GPS cold-start
+        maximumAge: 300000 // Accept a position cached within the last 5 minutes
       }
     )
   })
